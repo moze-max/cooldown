@@ -37,9 +37,16 @@ class IsarService {
   // 3. 获取所有物品 (Stream 监听变化)
   Stream<List<PurchaseItem>> listenToItems() async* {
     final isar = await db;
-    // 监听变化，无需手动调用setState，Isar会自动推送更新
-    yield* isar.purchaseItems.where().sortByNotifyDate().watch(
-      initialData: true,
-    );
+
+    // 1. **手动**获取并发送初始数据
+    final initialList = await isar.purchaseItems
+        .where()
+        .sortByNotifyDate()
+        .findAll();
+    yield initialList;
+
+    // 2. 启动 Query Watcher 监听后续的变化，不再需要 initialData/initialReturn
+    //    注意：这里我们使用 .watch()，它的作用是每当数据变化时，它就会再次推送
+    yield* isar.purchaseItems.where().sortByNotifyDate().watch();
   }
 }
