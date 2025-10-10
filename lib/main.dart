@@ -11,6 +11,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'cooldown', home: const HomePage());
+    return MaterialApp(
+      title: 'cooldown',
+      theme: ThemeData(fontFamily: "NotoSansSC"),
+      home: const HomePage(),
+      debugShowCheckedModeBanner: false,
+    );
   }
 }

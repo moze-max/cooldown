@@ -37,7 +37,7 @@ class TabBarAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('冷静期 (Cooldown App)'),
+      title: const Text('冷静期'),
       bottom: const TabBar(
         tabs: <Widget>[
           Tab(text: '输入'),
