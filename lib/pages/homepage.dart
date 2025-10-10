@@ -11,15 +11,15 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 使用 DefaultTabController 来管理 TabBar 和 TabBarView
-    return const DefaultTabController(
+    return DefaultTabController(
       length: 3, // 三个主选项卡：输入、日历、结果
       child: Scaffold(
-        appBar: TabBarAppBar(), // 顶部的 TabBar 导航栏
+        appBar: const TabBarAppBar(), // 顶部的 TabBar 导航栏
         body: TabBarView(
           children: <Widget>[
-            AddItemScreen(), // 对应第一个 Tab：输入页
+            const AddItemScreen(), // 对应第一个 Tab：输入页
             CalendarScreen(), // 对应第二个 Tab：日历/待办页
-            ResultsPage(), // 对应第三个 Tab：结果页 (包含子 Tab)
+            const ResultsPage(), // 对应第三个 Tab：结果页 (包含子 Tab)
           ],
         ),
       ),

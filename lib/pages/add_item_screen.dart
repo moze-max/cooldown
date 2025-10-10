@@ -59,7 +59,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 移除 Scaffold 中的 AppBar，因为 HomePage 已经提供了 TabBarAppBar
     return Form(
       key: _formKey,
       child: ListView(
