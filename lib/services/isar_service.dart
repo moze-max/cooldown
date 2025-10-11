@@ -3,9 +3,9 @@
 import 'dart:developer' as developer;
 
 import 'package:device_calendar/device_calendar.dart';
-import 'package:timezone/timezone.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:timezone/timezone.dart' as tz;
 import '../models/purchase_item.dart';
 
 class IsarService {
@@ -90,20 +90,25 @@ class IsarService {
   }
 
   Future<bool> addCalendarEvent(PurchaseItem item) async {
+    final location = tz.local;
+    final tzStartDateTime = tz.TZDateTime.from(item.notifyDate, location);
+    final tzEndDateTime = tz.TZDateTime.from(
+      item.notifyDate.add(const Duration(hours: 1)),
+      location,
+    );
     // 1. 请求权限
     final permissionResult = await _deviceCalendarPlugin.requestPermissions();
-    if (permissionResult.isSuccessful != true ||
-        permissionResult.data != true) {
-      debugPrint('日历权限被拒绝或请求失败');
+    if (permissionResult.isSuccess != true || permissionResult.data != true) {
+      developer.debugger(message: '日历权限被拒绝或请求失败');
       return false;
     }
 
     // 2. 获取默认/第一个日历
     final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
-    if (calendarsResult.isSuccessful != true ||
+    if (calendarsResult.isSuccess != true ||
         calendarsResult.data == null ||
         calendarsResult.data!.isEmpty) {
-      debugPrint('未找到可用的日历。');
+      developer.debugger(message: '未找到可用的日历。');
       return false;
     }
 
@@ -115,7 +120,7 @@ class IsarService {
         .id;
 
     if (calendarId == null) {
-      debugPrint('未找到可写入的日历。');
+      developer.debugger(message: '未找到可写入的日历。');
       return false;
     }
 
@@ -126,10 +131,10 @@ class IsarService {
       description:
           '价格：${item.price ?? '未定'}\n链接/备注：${item.url ?? '无'}\n\n[这是冷静期提醒，请理性消费]',
       // 设置事件的开始时间为提醒时间
-      start: item.notifyDate,
-      end: item.notifyDate.add(const Duration(hours: 1)), // 结束时间设为一小时后
+      start: tzStartDateTime,
+      end: tzEndDateTime, // 结束时间设为一小时后
       // 关键：设置提前提醒 (例如：准时提醒)
-      reminders: const [
+      reminders: [
         Reminder(minutes: 0), // 准时提醒
       ],
     );
@@ -137,11 +142,11 @@ class IsarService {
     // 4. 写入日历
     final result = await _deviceCalendarPlugin.createOrUpdateEvent(event);
 
-    if (result.isSuccessful == true) {
-      debugPrint('✅ 日历事件已成功创建，事件ID: ${result.data}');
+    if (result?.isSuccess == true) {
+      developer.debugger(message: '✅ 日历事件已成功创建，事件ID: ${result?.data}');
       return true;
     } else {
-      debugPrint('❌ 日历事件创建失败: ${result.errorMessages}');
+      developer.debugger(message: '❌ 日历事件创建失败: ${result?.errors}');
       return false;
     }
   }

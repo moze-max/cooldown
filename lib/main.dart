@@ -1,7 +1,10 @@
 import 'package:cooldown/pages/homepage.dart';
 import 'package:flutter/material.dart';
+import 'package:timezone/data/latest.dart' as tz; // 导入时区数据
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
   runApp(const MyApp());
 }
 
