@@ -14,6 +14,7 @@ class PurchaseItem {
   final String? url;
   final DateTime entryDate;
   final DateTime notifyDate;
+  final int delayDays;
   String status; // 'pending', 'bought', 'cancelled'
 
   PurchaseItem({
@@ -23,6 +24,7 @@ class PurchaseItem {
     required this.entryDate,
     required this.notifyDate,
     this.status = 'pending',
+    required this.delayDays,
   });
 }
 

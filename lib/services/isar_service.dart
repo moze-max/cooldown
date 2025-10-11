@@ -1,6 +1,7 @@
 // lib/services/isar_service.dart
 
 import 'dart:developer' as developer;
+import 'dart:io';
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:isar/isar.dart';
@@ -97,10 +98,14 @@ class IsarService {
       location,
     );
     // 1. 请求权限
-    final permissionResult = await _deviceCalendarPlugin.requestPermissions();
-    if (permissionResult.isSuccess != true || permissionResult.data != true) {
-      developer.debugger(message: '日历权限被拒绝或请求失败');
-      return false;
+    if (Platform.isWindows != true || Platform.isLinux != true) {
+      final permissionResult = await _deviceCalendarPlugin.requestPermissions();
+      if (permissionResult.isSuccess != true || permissionResult.data != true) {
+        developer.debugger(message: '日历权限被拒绝或请求失败');
+
+        return false;
+      }
+      return true;
     }
 
     // 2. 获取默认/第一个日历

@@ -39,6 +39,7 @@ dependencies:
   path_provider: ^2.1.5
   device_calendar: ^4.3.3
   timezone: ^0.9.4
+  flutter_local_notifications: ^18.0.1
   
 
 dev_dependencies:
