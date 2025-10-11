@@ -6,6 +6,8 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Cooldown</string>
+	<key>NSCalendarsWriteOnlyUsageDescription</key>
+	<string>应用需要您的日历权限来写入冷静期提醒。</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

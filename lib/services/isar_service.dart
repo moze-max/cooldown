@@ -2,13 +2,15 @@
 
 import 'dart:developer' as developer;
 
+import 'package:device_calendar/device_calendar.dart';
+import 'package:timezone/timezone.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/purchase_item.dart';
 
 class IsarService {
   late Future<Isar> db;
-
+  final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
   IsarService() {
     db = openIsar();
   }
@@ -85,6 +87,63 @@ class IsarService {
         .statusEqualTo('cancelled') // 👈 筛选 'cancelled' 状态
         .sortByNotifyDateDesc() // 按日期倒序排列
         .watch(fireImmediately: true);
+  }
+
+  Future<bool> addCalendarEvent(PurchaseItem item) async {
+    // 1. 请求权限
+    final permissionResult = await _deviceCalendarPlugin.requestPermissions();
+    if (permissionResult.isSuccessful != true ||
+        permissionResult.data != true) {
+      debugPrint('日历权限被拒绝或请求失败');
+      return false;
+    }
+
+    // 2. 获取默认/第一个日历
+    final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+    if (calendarsResult.isSuccessful != true ||
+        calendarsResult.data == null ||
+        calendarsResult.data!.isEmpty) {
+      debugPrint('未找到可用的日历。');
+      return false;
+    }
+
+    // 选取第一个可写（可编辑）的日历ID
+    final calendarId = calendarsResult.data!
+        .firstWhere(
+          (c) => c.isReadOnly != true && c.isDefault == true,
+        ) // 尝试找默认可写
+        .id;
+
+    if (calendarId == null) {
+      debugPrint('未找到可写入的日历。');
+      return false;
+    }
+
+    // 3. 构建日历事件
+    final event = Event(
+      calendarId,
+      title: '冷静期到期：是否购买 ${item.name}？',
+      description:
+          '价格：${item.price ?? '未定'}\n链接/备注：${item.url ?? '无'}\n\n[这是冷静期提醒，请理性消费]',
+      // 设置事件的开始时间为提醒时间
+      start: item.notifyDate,
+      end: item.notifyDate.add(const Duration(hours: 1)), // 结束时间设为一小时后
+      // 关键：设置提前提醒 (例如：准时提醒)
+      reminders: const [
+        Reminder(minutes: 0), // 准时提醒
+      ],
+    );
+
+    // 4. 写入日历
+    final result = await _deviceCalendarPlugin.createOrUpdateEvent(event);
+
+    if (result.isSuccessful == true) {
+      debugPrint('✅ 日历事件已成功创建，事件ID: ${result.data}');
+      return true;
+    } else {
+      debugPrint('❌ 日历事件创建失败: ${result.errorMessages}');
+      return false;
+    }
   }
 
   Future<void> printAllItems() async {
