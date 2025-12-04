@@ -25,7 +25,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final IsarService _isarService = IsarService(); // 实例化服务
   final LocalNotificationService _notificationService =
       LocalNotificationService(); // 实例化
-  final int _defaultDelayDays = 3;
   final bool _isMobilePlatform = Platform.isAndroid || Platform.isIOS;
 
   void _saveItem() async {
